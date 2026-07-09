@@ -16,6 +16,7 @@ class PublisherConfig:
     notion_token: str = ""
     notion_database_id: str = ""
     commit_output: bool = False
+    canonical_url: str = ""
 
     def __post_init__(self) -> None:
         self.workdir = Path(self.workdir).expanduser().resolve()

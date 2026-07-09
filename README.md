@@ -92,7 +92,8 @@ uv run python -m agent_artifact_publisher.cli \
   --summary "무엇을 만들었고 왜 필요한지 한 문장" \
   --github pr-body-only \
   --notion dry-run \
-  --gdrive-wiki dry-run
+  --gdrive-wiki dry-run \
+  --canonical-url "https://github.com/visualbridge7188/agent-artifact-publisher"
 ```
 
 그러면 `.artifact-publisher/` 폴더가 생깁니다.

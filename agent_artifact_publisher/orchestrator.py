@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from agent_artifact_publisher.config import PublisherConfig
-from agent_artifact_publisher.model import Artifact, InstallInfo
+from agent_artifact_publisher.model import Artifact, InstallInfo, PublishStatus, PublishTarget
 from agent_artifact_publisher.publishers.gdrive_wiki import publish_gdrive_wiki
 from agent_artifact_publisher.publishers.github import prepare_github_publish
 from agent_artifact_publisher.publishers.notion import prepare_notion_dry_run, publish_notion_page
@@ -46,7 +46,10 @@ def publish_artifact(
         ),
     )
     rendered = render_all(artifact)
-    prepare_github_publish(artifact, config.github_mode, rendered["pr-body"], output / "github")
+    if config.github_mode == "link" and config.canonical_url:
+        artifact.targets.append(PublishTarget(target="github", mode="link", url_or_path=config.canonical_url, status=PublishStatus.VERIFIED))
+    else:
+        prepare_github_publish(artifact, config.github_mode, rendered["pr-body"], output / "github")
     if config.notion_mode in {"create", "update"}:
         publish_notion_page(
             artifact,
@@ -55,15 +58,13 @@ def publish_artifact(
             database_id=config.notion_database_id,
             body=rendered["notion-page"],
             schema={"Title": "title", "URL": "url", "description": "rich_text", "stats": "status"},
-            canonical_url="",
+            canonical_url=config.canonical_url,
         )
     else:
         prepare_notion_dry_run(artifact, rendered["notion-page"], output / "notion")
     if config.gdrive_wiki_mode == "write" and config.gdrive_wiki_root:
         publish_gdrive_wiki(artifact, config.gdrive_wiki_root, rendered["wiki-guide"])
     elif config.gdrive_wiki_mode == "write":
-        from agent_artifact_publisher.model import PublishStatus, PublishTarget
-
         artifact.targets.append(PublishTarget(target="gdrive_wiki", mode="write", status=PublishStatus.FAILED, error="Missing GDRIVE_WIKI_ROOT"))
     rendered = render_all(artifact)
     (output / "publish-report.md").write_text(rendered["publish-report"], encoding="utf-8")
