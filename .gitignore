@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.artifact-publisher/
+live-github-workdir/
+*.tar.gz
+.env
+.DS_Store
+
+*.egg-info/
+push_official.py
