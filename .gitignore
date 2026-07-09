@@ -10,3 +10,6 @@ live-github-workdir/
 
 *.egg-info/
 push_official.py
+close_test_pr.py
+publish_official_artifact.py
+append_notion_guide.py
